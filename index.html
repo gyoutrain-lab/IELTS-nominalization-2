@@ -2,78 +2,71 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Advanced IELTS Band 9 Drill</title>
+    <title>Integrated Band 9 Master-Drill</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #eef2f3; display: flex; justify-content: center; padding: 20px; }
-        .card { background: white; width: 100%; max-width: 750px; padding: 30px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
-        .feedback-box { margin-top: 20px; padding: 15px; border-radius: 6px; border-left: 5px solid #3498db; background: #f8f9fa; }
-        .score-display { font-size: 1.2em; font-weight: bold; color: #e67e22; }
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; }
-        button { background: #2c3e50; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; width: 100%; max-width: 700px; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .dropdown { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #3498db; border-radius: 6px; background: white; cursor: pointer; }
+        button { background: #2c3e50; color: white; border: none; padding: 15px; width: 100%; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        #output { margin-top: 20px; padding: 20px; background: #ecf0f1; border-radius: 6px; display: none; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>Academic Register Builder (Band 9)</h2>
-    <p id="q-text"><strong>Prompt:</strong> Loading...</p>
+    <h2>Band 9 Integrated Compiler</h2>
+    <p id="prompt"><strong>Prompt:</strong> Loading...</p>
+
+    <select id="cause" class="dropdown"><option value="">-- Choose Nominalized Cause --</option></select>
+    <select id="verb" class="dropdown"><option value="">-- Choose Academic Verb --</option></select>
+    <select id="effect" class="dropdown"><option value="">-- Choose Nominalized Outcome --</option></select>
     
-    <label>1. Nominalized Cause:</label>
-    <input type="text" id="sub" placeholder="e.g. The implementation of strict regulations">
+    <button onclick="render()">Submit & Evaluate</button>
     
-    <label>2. Select Contextual Verb:</label>
-    <select id="verb"></select>
-    
-    <label>3. Nominalized Outcome:</label>
-    <input type="text" id="obj" placeholder="e.g. the rapid mitigation of carbon emissions">
-    
-    <button onclick="evaluateDrill()">Submit & Score</button>
-    <button onclick="nextCase()" style="background:#7f8c8d">Next Case</button>
-    
-    <div id="feedback" class="feedback-box" style="display:none;"></div>
-    <button id="tts" onclick="speak()" style="background:#8e44ad; margin-top:10px; display:none;">🔊 Listen to Result</button>
+    <div id="output"></div>
 </div>
 
 <script>
-    const cases = [
-        { q: "Companies fire workers because they have no money.", type: "negative", verbs: ["precipitates", "culminates in", "exacerbates"] },
-        { q: "Studying hard helps students get good grades.", type: "positive", verbs: ["facilitates", "is instrumental in", "correlates with"] },
-        { q: "Building more roads creates more traffic.", type: "negative", verbs: ["engenders", "leads to the amplification of", "compounds"] }
+    const data = [
+        { 
+            q: "Smoking makes people have more health problems.",
+            causes: ["The widespread consumption of tobacco products", "Prolonged exposure to nicotine"],
+            verbs: ["correlates with", "is a primary determinant of"],
+            effects: ["the proliferation of chronic respiratory ailments", "the degradation of cardiovascular health"]
+        },
+        { 
+            q: "Using computers helps students learn faster.",
+            causes: ["The integration of digital learning technologies", "The adoption of computer-aided instruction"],
+            verbs: ["facilitates", "accelerates"],
+            effects: ["the optimization of pedagogical efficiency", "the expedited acquisition of knowledge"]
+        }
     ];
 
     let current = 0;
 
     function init() {
-        document.getElementById('q-text').innerHTML = `<strong>Prompt:</strong> ${cases[current].q}`;
-        const vSelect = document.getElementById('verb');
-        vSelect.innerHTML = cases[current].verbs.map(v => `<option value="${v}">${v}</option>`).join('');
+        document.getElementById('prompt').innerHTML = `<strong>Prompt:</strong> ${data[current].q}`;
+        ['cause', 'verb', 'effect'].forEach(id => {
+            let el = document.getElementById(id);
+            el.innerHTML = '<option value="">-- Choose --</option>' + 
+                data[current][id + 's'].map(opt => `<option value="${opt}">${opt}</option>`).join('');
+        });
     }
 
-    function evaluateDrill() {
-        const s = document.getElementById('sub').value;
-        const o = document.getElementById('obj').value;
-        const fb = document.getElementById('feedback');
+    function render() {
+        const c = document.getElementById('cause').value;
+        const v = document.getElementById('verb').value;
+        const e = document.getElementById('effect').value;
+        const out = document.getElementById('output');
         
-        // Simple scoring logic: Length = Complexity
-        let score = (s.length > 20 && o.length > 20) ? "9.0" : "7.5";
-        
-        fb.style.display = 'block';
-        fb.innerHTML = `<p class="score-display">Estimated Band Score: ${score}</p>
-                        <p><strong>Result:</strong> "${s} ${document.getElementById('verb').value} ${o}."</p>
-                        <p><em>Review:</em> Ensure the cause and effect are purely nominalized. Avoid using 'that' or 'because'.</p>`;
-        document.getElementById('tts').style.display = 'block';
+        out.style.display = 'block';
+        if(!c || !v || !e) {
+            out.innerHTML = "<strong>Score: N/A</strong> <br> Please complete all fields to generate your Band 9 evaluation.";
+        } else {
+            out.innerHTML = `<strong>Estimated Band: 9.0</strong><br><em>"${c} ${v} ${e}."</em>`;
+        }
     }
 
-    function speak() {
-        const text = `${document.getElementById('sub').value} ${document.getElementById('verb').value} ${document.getElementById('obj').value}.`;
-        window.speechSynthesis.speak(new SpeechSynthesisUtterance(text));
-    }
-
-    function nextCase() { 
-        current = (current + 1) % cases.length; 
-        document.getElementById('feedback').style.display = 'none';
-        init(); 
-    }
     init();
 </script>
 </body>
