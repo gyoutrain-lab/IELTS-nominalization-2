@@ -7,8 +7,9 @@
         body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; display: flex; justify-content: center; padding: 20px; }
         .card { background: white; width: 100%; max-width: 700px; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .dropdown { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #3498db; border-radius: 6px; background: white; cursor: pointer; }
-        button { background: #2c3e50; color: white; border: none; padding: 15px; width: 100%; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        #output { margin-top: 20px; padding: 20px; background: #ecf0f1; border-radius: 6px; display: none; }
+        button { background: #2c3e50; color: white; border: none; padding: 15px; width: 100%; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 5px; }
+        #output { margin-top: 20px; padding: 20px; background: #ecf0f1; border-radius: 6px; display: none; border-left: 5px solid #2c3e50; }
+        .nav-btn { background: #27ae60; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -22,8 +23,10 @@
     <select id="effect" class="dropdown"><option value="">-- Choose Nominalized Outcome --</option></select>
     
     <button onclick="render()">Submit & Evaluate</button>
+    <button class="nav-btn" onclick="nextCase()">Next Case &raquo;</button>
     
     <div id="output"></div>
+    <button id="tts" onclick="speak()" style="display:none; background:#8e44ad; margin-top:10px;">🔊 Listen to Result</button>
 </div>
 
 <script>
@@ -46,6 +49,9 @@
 
     function init() {
         document.getElementById('prompt').innerHTML = `<strong>Prompt:</strong> ${data[current].q}`;
+        document.getElementById('output').style.display = 'none';
+        document.getElementById('tts').style.display = 'none';
+        
         ['cause', 'verb', 'effect'].forEach(id => {
             let el = document.getElementById(id);
             el.innerHTML = '<option value="">-- Choose --</option>' + 
@@ -61,10 +67,21 @@
         
         out.style.display = 'block';
         if(!c || !v || !e) {
-            out.innerHTML = "<strong>Score: N/A</strong> <br> Please complete all fields to generate your Band 9 evaluation.";
+            out.innerHTML = "<strong>Score: N/A</strong> <br> Incomplete construction. Please select all components to achieve a Band 9 evaluation.";
         } else {
             out.innerHTML = `<strong>Estimated Band: 9.0</strong><br><em>"${c} ${v} ${e}."</em>`;
+            document.getElementById('tts').style.display = 'block';
         }
+    }
+
+    function speak() {
+        const text = `${document.getElementById('cause').value} ${document.getElementById('verb').value} ${document.getElementById('effect').value}.`;
+        window.speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+    }
+
+    function nextCase() {
+        current = (current + 1) % data.length;
+        init();
     }
 
     init();
