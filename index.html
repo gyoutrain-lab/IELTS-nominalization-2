@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Band 9 Academic Mastery Drill</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; width: 100%; max-width: 700px; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .label { font-weight: bold; color: #34495e; display: block; margin-top: 15px; }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        button { background: #27ae60; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; margin-top: 10px; }
+        #feedback { margin-top: 20px; padding: 15px; border-radius: 6px; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>IELTS Band 9 Nominalization Drill</h2>
+    <p id="question">Loading...</p>
+    <label class="label">1. Nominalize the Cause:</label>
+    <input type="text" id="sub" placeholder="Subject...">
+    <label class="label">2. Select Academic Verb:</label>
+    <select id="verb">
+        <option value="facilitates">facilitates</option>
+        <option value="serves as a catalyst for">serves as a catalyst for</option>
+        <option value="substantially mitigates">substantially mitigates</option>
+        <option value="is instrumental in achieving">is instrumental in achieving</option>
+    </select>
+    <label class="label">3. Nominalize the Outcome:</label>
+    <input type="text" id="obj" placeholder="Outcome...">
+    
+    <button onclick="checkAnswer()">Submit & Get Score</button>
+    <button onclick="nextQuestion()" style="background:#3498db">Next Case &raquo;</button>
+    
+    <div id="feedback"></div>
+    <button id="tts" onclick="speakResult()" style="background:#8e44ad; display:none;">🔊 Listen to Result</button>
+</div>
+
+<script>
+    const data = [
+        {q: "People using cars too much causes traffic jams.", s: "The over-reliance on private vehicles", v: "facilitates", o: "the exacerbation of urban traffic congestion"},
+        {q: "If children play outside, they get healthier.", s: "Increased engagement in outdoor physical activities", v: "facilitates", o: "the enhancement of pediatric health outcomes"},
+        // Add up to 50 entries here
+    ];
+    let currentIdx = 0;
+    
+    function update() { document.getElementById('question').innerText = `Case ${currentIdx + 1}: "${data[currentIdx].q}"`; }
+    
+    function checkAnswer() {
+        const s = document.getElementById('sub').value;
+        const o = document.getElementById('obj').value;
+        const fb = document.getElementById('feedback');
+        fb.style.display = 'block';
+        fb.style.background = (s.length > 10 && o.length > 10) ? "#d4edda" : "#f8d7da";
+        fb.innerHTML = (s.length > 10 && o.length > 10) ? "<strong>Band 9 Score: Professional.</strong> Your structure demonstrates strong nominalization." : "<strong>Score: Needs Improvement.</strong> Ensure you are using noun phrases (e.g., 'The implementation of...') rather than verb phrases.";
+        document.getElementById('tts').style.display = 'inline-block';
+    }
+
+    function speakResult() {
+        const text = `The result is: ${document.getElementById('sub').value} ${document.getElementById('verb').value} ${document.getElementById('obj').value}.`;
+        window.speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+    }
+
+    function nextQuestion() {
+        currentIdx = (currentIdx + 1) % data.length;
+        update();
+    }
+    update();
+</script>
+</body>
+</html>
